@@ -1,0 +1,14 @@
+irc:
+    server: irc.hackint.org
+    port: 6697
+    target: "#test123"
+    nickname: eka-bot
+
+jobs:
+    - python_file: ebay.py
+      every_minutes: 120
+    
+searches:
+    - product: tv full hd
+      location: Darmstadt
+      max_price: 110
