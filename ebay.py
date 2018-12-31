@@ -52,7 +52,7 @@ class EbayKleinanzeigen(object):
         offers = []
         for offer_html in self.get_offers_as_html(search_url, price):
             offer = Offer(offer_html)
-            #cprint("   Found: '{}' for {} € in {}\n   url: {}".format(offer.title, offer.price, offer.locality, offer.url), 'green')
+            cprint("   Found: '{}' for {} € in {}\n   url: {}".format(offer.title, offer.price, offer.locality, offer.url), 'green')
             offers.append(offer)
 
         filename = os.path.join(data_dir, "{}-{}.json".format(product, location))
@@ -86,7 +86,7 @@ class EbayKleinanzeigen(object):
         offer_urls_last_time = [o['url'] for o in offers_last_state]
         for offer in offers:
             if offer.url not in offer_urls_last_time:
-                #self.notify_test(offer)
+                self.notify_test(offer)
                 self.notifications.append(offer)
         with open(filename, "w") as f:
             json.dump([o.__dict__ for o in offers], f)
