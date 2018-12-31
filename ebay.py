@@ -39,7 +39,7 @@ class EbayKleinanzeigen(object):
 
     def __init__(self):
         self.session = requests.Session()
-        self.session.headers.update({'user-agent': 'ebay-kleinanzeigen bot'})
+        self.session.headers.update({'User-Agent': 'ebay-kleinanzeigen sofort'})
         
         self.settings = yaml.safe_load(open(settings))
         self.notifications = []
@@ -68,12 +68,13 @@ class EbayKleinanzeigen(object):
                      "seite:{}/" + \
                      "preis::{}/" + \
                      "/".join(base_search_url.split("/")[4:])
-        for i in range(1, 40):
+        for i in range(1, 5):
             print(" Looking at result page {}".format(i))
             resp = self.session.get(search_url.format(i, price), allow_redirects=False)
             if "Es wurden keine Anzeigen für" in resp.text or resp.status_code == 302:
                 print("  Nothing found here")
                 return
+            set_trace()
             relevant_html = resp.text.split("Alternative Anzeigen")[0]
             bs = BeautifulSoup(relevant_html, 'html.parser')
             offer_links = [x['data-href'] for x in bs.findAll('div', {'class': 'imagebox srpimagebox'})]
