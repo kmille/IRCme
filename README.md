@@ -21,9 +21,11 @@ systemctl daemon-reload
 
 ## Configuration (check settings.yaml)
 irc  
-    - nickname is the name of the bot
-    - target can be a channel (e.g. #test123) or an irc username
+    - nickname is the name of the bot  
+    - target can be a channel (e.g. #test123) or an irc username  
 
 jobs  
-    - list containing python_file and every_minutes (60 for run it every 60 minutes)
+    - list containing python_file and every_minutes (60 for run it every 60 minutes)  
+
+
 
