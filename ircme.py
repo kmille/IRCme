@@ -86,7 +86,11 @@ class IRCme:
         logger.info("Executing job for {} at {}".format(python_file, arrow.now().format("HH:mm:ss")))
         if python_file.endswith(".py"):
             python_file = python_file[:-3]
-        lib = importlib.import_module(python_file)
+        try:
+            lib = importlib.import_module(python_file)
+        except ModuleNotFoundError as e:
+            logger.fatal("Could not load module {}.\n{}".format(python_file, e))
+
         try:
             ret = lib.go()
         except Exception as e:
