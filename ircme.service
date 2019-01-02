@@ -1,0 +1,14 @@
+[Unit]
+Description=Start IRCme notification
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ircme/IRCme
+User=ircme
+Group=ircme
+Environment=SETTINGS=settings.yaml
+Environment=MODULE_PATH=modules
+ExecStart=/home/ircme/IRCme/venv/bin/python ircme.py
+
+[Install]
+WantedBy=multi-user.target

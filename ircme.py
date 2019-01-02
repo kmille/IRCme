@@ -90,6 +90,7 @@ class IRCme:
             lib = importlib.import_module(python_file)
         except ModuleNotFoundError as e:
             logger.fatal("Could not load module {}.\n{}".format(python_file, e))
+            return
 
         try:
             ret = lib.go()
