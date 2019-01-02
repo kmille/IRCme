@@ -1,4 +1,3 @@
 # todo
 - docs
-- systemd unit file 
-- logging in ebay.py
+- systemd unit file  + als anderer user laufen lassen

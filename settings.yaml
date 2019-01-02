@@ -6,9 +6,9 @@ irc:
 
 jobs:
     - python_file: ebay.py
-      every_minutes: 120
+      every_minutes: .20
     
-searches:
+ebay-kleinanzeigen:
     - product: tv full hd
       location: Darmstadt
       max_price: 110

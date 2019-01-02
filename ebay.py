@@ -10,9 +10,13 @@ import re
 from termcolor import cprint
 
 settings = "settings.yaml"
+
 base_url = "https://www.ebay-kleinanzeigen.de{}"
 product_search_url = "https://www.ebay-kleinanzeigen.de/s-suchanfrage.html?keywords={}&categoryId=&locationStr={}&locationId=&radius=0&sortingField=SORTING_DATE&adType=&posterType=&pageNum=1&action=find&maxPrice=&minPrice="
-data_dir = "data"
+
+DATA_DIR = "data"
+SEARCH_PAGES = 10 
+
 
 class Offer(object):
 
@@ -43,7 +47,7 @@ class EbayKleinanzeigen(object):
         
         self.settings = yaml.safe_load(open(settings))
         self.notifications = []
-        for search in self.settings['searches']:
+        for search in self.settings.get('ebay-kleinanzeigen', []):
             cprint("Looking for '{}' in {}".format(search['product'], search['location']), 'magenta')
             self.search(search['product'], search['location'], search.get('max_price', -1))
 
@@ -52,10 +56,10 @@ class EbayKleinanzeigen(object):
         offers = []
         for offer_html in self.get_offers_as_html(search_url, price):
             offer = Offer(offer_html)
-            cprint("   Found: '{}' for {} € in {}\n   url: {}".format(offer.title, offer.price, offer.locality, offer.url), 'green')
+            #cprint("   Found: '{}' for {} € in {}\n   url: {}".format(offer.title, offer.price, offer.locality, offer.url), 'green')
             offers.append(offer)
 
-        filename = os.path.join(data_dir, "{}-{}.json".format(product, location))
+        filename = os.path.join(DATA_DIR, "{}-{}.json".format(product, location))
         if not os.path.exists(filename):
             with open(filename, "w") as f:
                 json.dump([o.__dict__ for o in offers], f)
@@ -68,13 +72,15 @@ class EbayKleinanzeigen(object):
                      "seite:{}/" + \
                      "preis::{}/" + \
                      "/".join(base_search_url.split("/")[4:])
-        for i in range(1, 5):
+        for i in range(1, SEARCH_PAGES):
             print(" Looking at result page {}".format(i))
             resp = self.session.get(search_url.format(i, price), allow_redirects=False)
             if "Es wurden keine Anzeigen für" in resp.text or resp.status_code == 302:
                 print("  Nothing found here")
                 return
-            set_trace()
+            if "You look like a robot" in resp.text:
+                cprint("Bot detection. What helped for me: use ipv4 instead of ipv6 (don't know why). Just put the ipv4 addresses for www.ebay-kleinanzeigen.de in /etc/hosts", "red")
+                exit()
             relevant_html = resp.text.split("Alternative Anzeigen")[0]
             bs = BeautifulSoup(relevant_html, 'html.parser')
             offer_links = [x['data-href'] for x in bs.findAll('div', {'class': 'imagebox srpimagebox'})]
@@ -97,14 +103,7 @@ class EbayKleinanzeigen(object):
         cprint("   Found new offer: {}".format(offer.url), 'cyan')
 
 
-def test_parse_offer_details():
-    with open("html/details.html") as f:
-        o = Offer(f.read())
-    assert o.title == 'Glaskaraffe 900 mL NEU OVP'
-
-
 if __name__ == '__main__':
-    #test_parse_offer_details()
     EbayKleinanzeigen()
 
 

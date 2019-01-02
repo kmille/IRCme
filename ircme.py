@@ -87,7 +87,11 @@ class IRCme:
         if python_file.endswith(".py"):
             python_file = python_file[:-3]
         lib = importlib.import_module(python_file)
-        ret = lib.go()
+        try:
+            ret = lib.go()
+        except Exception as e:
+            logger.fatal("Error executing script.\n{}".format(e))
+        
         while not hasattr(self, 'irc_connection'):
             logger.info("Waiting for irc connection")
             time.sleep(3)
