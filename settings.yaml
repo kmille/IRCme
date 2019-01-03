@@ -9,6 +9,9 @@ jobs:
       every_minutes: .20
     
 ebay-kleinanzeigen:
-    - product: tv full hd
-      location: Darmstadt
+    - product: Twenty one pilots
+      location: Deutschland
       max_price: 110
+    #- product: Fifa 16
+    #location: Darmstadt
+    #max_price: 110

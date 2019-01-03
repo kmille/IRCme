@@ -15,16 +15,16 @@ base_url = "https://www.ebay-kleinanzeigen.de{}"
 product_search_url = "https://www.ebay-kleinanzeigen.de/s-suchanfrage.html?keywords={}&categoryId=&locationStr={}&locationId=&radius=0&sortingField=SORTING_DATE&adType=&posterType=&pageNum=1&action=find&maxPrice=&minPrice="
 
 DATA_DIR = "data"
-SEARCH_PAGES = 10 
+SEARCH_PAGES = 2
 
 
 class Offer(object):
 
     def __init__(self, offer_html):
         bs = BeautifulSoup(offer_html, 'html.parser')
+        self.title = bs.find("meta", {'property':"og:title"}).attrs['content']
         self.image_url = bs.find("meta", {'property':"og:image"}).attrs['content']
         self.description = bs.find("meta", {'property':"og:description"}).attrs['content']
-        self.title = bs.find("meta", {'property':"og:title"}).attrs['content']
         self.url = bs.find("meta", {'property':"og:url"}).attrs['content']
         self.locality = bs.find("meta", {'property':"og:locality"}).attrs['content']
         self.latitude = bs.find("meta", {'property':"og:latitude"}).attrs['content']
@@ -51,12 +51,13 @@ class EbayKleinanzeigen(object):
             cprint("Looking for '{}' in {}".format(search['product'], search['location']), 'magenta')
             self.search(search['product'], search['location'], search.get('max_price', -1))
 
+
     def search(self, product, location, price):
-        search_url = self.session.get(product_search_url.format(product, location)).url
+        search_url = self.session.get(product_search_url.format(product, location)).url # follows a redirect
         offers = []
-        for offer_html in self.get_offers_as_html(search_url, price):
+        for offer_html in self.get_offers_as_html(search_url, price, product):
             offer = Offer(offer_html)
-            #cprint("   Found: '{}' for {} € in {}\n   url: {}".format(offer.title, offer.price, offer.locality, offer.url), 'green')
+            cprint("   Found: '{}'".format(offer.title), 'green')
             offers.append(offer)
 
         filename = os.path.join(DATA_DIR, "{}-{}.json".format(product, location))
@@ -66,13 +67,19 @@ class EbayKleinanzeigen(object):
         self.find_new_offers(offers, filename)
 
     
-    def get_offers_as_html(self, base_search_url, price):
-        search_url = "/".join(base_search_url.split("/")[:4]) + \
-                     "anzeige:angebote/" + \
-                     "seite:{}/" + \
-                     "preis::{}/" + \
-                     "/".join(base_search_url.split("/")[4:])
-        for i in range(1, SEARCH_PAGES):
+    def get_offers_as_html(self, base_search_url, price, product):
+        parts = base_search_url.split("/")
+        print(base_search_url)
+        if base_search_url.endswith("k0"): 
+            # deutschland-weite Suche
+            search_url = "https://www.ebay-kleinanzeigen.de/s-anzeige:angebote/seite::{}/preis:{}/%s/k0" % product
+        else:
+            search_url = "/".join(parts[:len(parts)-2]) + \
+                         "/anzeige:angebote/" + \
+                         "seite:{}/" + \
+                         "preis::{}/" + \
+                         "/".join(parts[len(parts)-2:])
+        for i in range(1, SEARCH_PAGES+1):
             print(" Looking at result page {}".format(i))
             resp = self.session.get(search_url.format(i, price), allow_redirects=False)
             if "Es wurden keine Anzeigen für" in resp.text or resp.status_code == 302:
@@ -85,7 +92,12 @@ class EbayKleinanzeigen(object):
             bs = BeautifulSoup(relevant_html, 'html.parser')
             offer_links = [x['data-href'] for x in bs.findAll('div', {'class': 'imagebox srpimagebox'})]
             for offer_url in offer_links:
-                yield self.session.get(base_url.format(offer_url)).text
+                resp =  self.session.get(base_url.format(offer_url))
+                if resp.status_code == 429:
+                    cprint("Bot error: Too many requests \n{}".format(resp.text), 'red')
+                    return
+                yield resp.text
+
 
 
     def find_new_offers(self, offers, filename):

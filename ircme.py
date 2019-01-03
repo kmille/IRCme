@@ -96,6 +96,7 @@ class IRCme:
             ret = lib.go()
         except Exception as e:
             logger.fatal("Error executing script.\n{}".format(e))
+            return
         
         while not hasattr(self, 'irc_connection'):
             logger.info("Waiting for irc connection")
