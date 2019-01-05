@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-from bs4 import BeautifulSoup
-from ipdb import set_trace
+import os
+import re
+import time
+from termcolor import cprint
 import requests
 import json
 import hashlib
-import os
 import yaml
-import re
-from termcolor import cprint
+from bs4 import BeautifulSoup
+
+from ipdb import set_trace
 
 settings = "settings.yaml"
 
@@ -69,7 +71,6 @@ class EbayKleinanzeigen(object):
     
     def get_offers_as_html(self, base_search_url, price, product):
         parts = base_search_url.split("/")
-        print(base_search_url)
         if base_search_url.endswith("k0"): 
             # deutschland-weite Suche
             search_url = "https://www.ebay-kleinanzeigen.de/s-anzeige:angebote/seite::{}/preis:{}/%s/k0" % product
@@ -94,9 +95,10 @@ class EbayKleinanzeigen(object):
             for offer_url in offer_links:
                 resp =  self.session.get(base_url.format(offer_url))
                 if resp.status_code == 429:
-                    cprint("Bot error: Too many requests \n{}".format(resp.text), 'red')
+                    cprint("Bot error: Too many requests \n{}\n{}".format(resp.headers, resp.text), 'red')
                     return
                 yield resp.text
+            self.session = requests.Session() # fixes rate limiting :)
 
 
 

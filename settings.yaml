@@ -5,13 +5,12 @@ irc:
     nickname: eka-bot
 
 jobs:
-    - python_file: ebay.py
-      every_minutes: .20
+    - python_file: test.py
+      every_minutes: 120
+    - python_file: ebaykleinanzeigen.py
+      every_minutes: 240
     
 ebay-kleinanzeigen:
     - product: Twenty one pilots
       location: Deutschland
-      max_price: 110
-    #- product: Fifa 16
-    #location: Darmstadt
-    #max_price: 110
+      max_price: 80
