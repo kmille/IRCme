@@ -43,15 +43,19 @@ class Offer(object):
     
 class EbayKleinanzeigen(object):
 
+
     def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({'User-Agent': 'ebay-kleinanzeigen sofort'})
-        
+        self.create_requests_session() 
         self.settings = yaml.safe_load(open(settings))
         self.notifications = []
         for search in self.settings.get('ebay-kleinanzeigen', []):
             cprint("Looking for '{}' in {}".format(search['product'], search['location']), 'magenta')
             self.search(search['product'], search['location'], search.get('max_price', -1))
+
+    
+    def create_requests_session(self):
+        self.session = requests.Session()
+        self.session.headers.update({'User-Agent': 'ebay-kleinanzeigen bod'})
 
 
     def search(self, product, location, price):
@@ -73,13 +77,14 @@ class EbayKleinanzeigen(object):
         parts = base_search_url.split("/")
         if base_search_url.endswith("k0"): 
             # deutschland-weite Suche
-            search_url = "https://www.ebay-kleinanzeigen.de/s-anzeige:angebote/seite::{}/preis:{}/%s/k0" % product
+            search_url = "https://www.ebay-kleinanzeigen.de/s-anzeige:angebote/seite:{}/preis:{}/%s/k0" % product
         else:
             search_url = "/".join(parts[:len(parts)-2]) + \
                          "/anzeige:angebote/" + \
                          "seite:{}/" + \
                          "preis::{}/" + \
                          "/".join(parts[len(parts)-2:])
+        print(search_url)
         for i in range(1, SEARCH_PAGES+1):
             print(" Looking at result page {}".format(i))
             resp = self.session.get(search_url.format(i, price), allow_redirects=False)
@@ -98,11 +103,12 @@ class EbayKleinanzeigen(object):
                     cprint("Bot error: Too many requests \n{}\n{}".format(resp.headers, resp.text), 'red')
                     return
                 yield resp.text
-            self.session = requests.Session() # fixes rate limiting :)
+            self.create_requests_session() 
 
 
 
     def find_new_offers(self, offers, filename):
+        print("Comparing the crawled offers with the last ones")
         offers_last_state = json.load(open(filename))
         offer_urls_last_time = [o['url'] for o in offers_last_state]
         for offer in offers:

@@ -11,6 +11,6 @@ jobs:
       every_minutes: 240
     
 ebay-kleinanzeigen:
-    - product: Twenty one pilots
+    - product: Twenty one pilots Stuttgart
       location: Deutschland
       max_price: 80

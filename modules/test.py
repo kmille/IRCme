@@ -1,4 +1,4 @@
 import arrow
 
 def go():
-    return "msg from ebay.py {}".format(arrow.now())
+    return "{}: Test message at {}".format(__name__, arrow.now().format("HH:mm:ss"))
