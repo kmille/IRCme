@@ -22,12 +22,14 @@ def get_trips(trip):
 
 
 def dump(filename, trips):
-    if not os.path.exists(filename):
-        # first run: all are new
-        for trip in trips:
-            notify_print(trip)
-        with open(filename, "wb") as f:
-            pickle.dump(trips, f)
+    results = []
+    for trip in trips:
+        notify_print(trip)
+        msg = "Blablacar: um {} für {} € {}".format(trip.departure_date, trip.price['value'], trip.links['_front'])
+        results.append(msg)
+    with open(filename, "wb") as f:
+        pickle.dump(trips, f)
+    return results 
 
 
 def notify_print(trip):
@@ -60,9 +62,12 @@ def find_trips():
                                                                      search['starting_at_date'], 
                                                                      search['starting_at_time'], 
                                                                      search['starting_at_time']))
-        dump(filename, trips)
-        results = check_new(filename, trips)
-        return results
+        if not os.path.exists(filename):
+            # first run: all are new
+            result.extend(dump(filename, trips))
+        else:
+            result.extend(check_new(filename, trips))
+    return result
 
 
 def go():
