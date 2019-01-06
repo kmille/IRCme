@@ -1,16 +1,24 @@
 irc:
     server: irc.hackint.org
     port: 6697
-    target: "#test123"
-    nickname: eka-bot
+    target: "#kmille-bot-solutions"
+    nickname: Botmar
 
 jobs:
     - python_file: test.py
       every_minutes: 120
     - python_file: ebaykleinanzeigen.py
       every_minutes: 240
+      #- python_file: blablacar.py
+      #every_minutes: .2
     
 ebay-kleinanzeigen:
     - product: Twenty one pilots Stuttgart
       location: Deutschland
       max_price: 80
+
+blablacar:
+    - from: Darmstadt
+      to: Würzburg
+      starting_at_date: 2019-01-06
+      starting_at_time: 14
