@@ -55,18 +55,21 @@ def find_trips():
     result = []
     trip_searches = yaml.safe_load(open(settings))
     for search in trip_searches['blablacar']:
-        trips = get_trips(search)
-        print("API gave us {} trips".format(len(trips)))
-        filename = os.path.join(DATA_DIR, "{}-{}-{}-{}.pickl".format(search['from'], 
-                                                                     search['to'], 
-                                                                     search['starting_at_date'], 
-                                                                     search['starting_at_time'], 
-                                                                     search['starting_at_time']))
-        if not os.path.exists(filename):
-            # first run: all are new
-            result.extend(dump(filename, trips))
+        if arrow.now() > arrow.get(search['starting_at_date']):
+            print("Fahrt from {} to {} liegt in der Vergangenheit".format(search['from'], search['to']))
         else:
-            result.extend(check_new(filename, trips))
+            trips = get_trips(search)
+            print("API gave us {} trips".format(len(trips)))
+            filename = os.path.join(DATA_DIR, "{}-{}-{}-{}.pickl".format(search['from'], 
+                                                                         search['to'], 
+                                                                         search['starting_at_date'], 
+                                                                         search['starting_at_time'], 
+                                                                         search['starting_at_time']))
+            if not os.path.exists(filename):
+                # first run: all are new
+                result.extend(dump(filename, trips))
+            else:
+                result.extend(check_new(filename, trips))
     return result
 
 
