@@ -2,7 +2,7 @@
 
 ## What it does? 
 - ircme.py reads settings.yaml which contains your irc settings (server, botname, channel) and your jobs (python file + how often it should be executed e.g every 60 minutes)
-- a job is a python simple file. ireqme.py will load it during runtime and execute the go function
+- a job is a simple python file. ireqme.py will load it during runtime and execute the go function
 
 ## If you want to try it
 git clone https://github.com/kmille/IRCme.git /home/ircme/IRCme  
