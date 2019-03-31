@@ -49,6 +49,8 @@ class IRCme:
 
         c.add_global_handler("welcome", self.on_connect)
         c.add_global_handler("disconnect", self.on_disconnect)
+        c.add_global_handler("privmsg", self.on_privmsg)
+        c.add_global_handler("pubmsg", self.on_pubmsg)
 
     
     def on_connect(self, connection, event):
@@ -64,7 +66,30 @@ class IRCme:
         logger.fatal("We got disconnected from the irc server", str(event))
         sys.exit(1)
     
+    def on_pubmsg(self, connection, event):
+        msg = event.arguments[0]
+        # if someone talks to us
+        if self.settings['irc']['nickname'] in msg:
+            self.handle_received_msg(msg)
+   
+    def on_privmsg(self, connection, event):
+        self.handle_received_msg(event.arguments[0])
     
+    def handle_received_msg(self, msg):
+        logger.info("received msg: {}".format(msg))
+        jobs = [job['python_file'] for job in self.settings['jobs']]
+        if "list" in msg:
+            msg = "jobs: {}".format(" | ".join([job for job in jobs]))
+        if "do" in msg:
+            job = msg.split()[2]
+            if job not in jobs:
+                msg = "job not found"
+            else:
+                Thread(target=self.do_job, args=(job,)).start()
+                msg = "will do it!"
+        self.irc_connection.privmsg(self.target, msg)
+    
+
     def setup_jobs(self):
         logger.info("Loading jobs")
         sys.path.insert(0, os.environ['MODULE_PATH'])
