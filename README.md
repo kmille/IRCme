@@ -10,7 +10,7 @@ cd /home/ircme/IRCme
 python3 -m virtualenv venv  
 source venv/bin/activate  
 pip install -r requirements.txt  
-check the settings.py (for testing you can just run test.py from the modules directory)  
+check the settings.py (for testing you can just run ping.py from the modules directory)  
 python ircme.py  
 
 ## Persistence
@@ -28,4 +28,11 @@ jobs
     - list containing python_file and every_minutes (60 for run it every 60 minutes)  
 
 
+## Trigger the bot manually
+supported commands are (you have to mention the botname like 'bot43: list'):  
+
+| command       | what it does                           |
+| --------------|:------------------------------------|
+| list          | shows all jobs listed in settings.yaml |
+| do <job>      | executes a job (e.g do ping.py         |
 
