@@ -2,15 +2,22 @@ irc:
     server: irc.hackint.org
     port: 6697
     target: "#kmille-bot-solutions"
-    nickname: Botmar
+    #target: "@kmille"
+    nickname: botmar
 
 jobs:
-    - python_file: test.py
-      every_minutes: 120
-    - python_file: ebaykleinanzeigen.py
-      every_minutes: 240
-      #- python_file: blablacar.py
-      #every_minutes: .2
+  - python_file: ping
+    every_minutes: 86400
+  - python_file: vnex
+    every_minutes: 61
+  - python_file: aldi-talk
+    every_minutes: 12312312
+     #- python_file: blablacar.py
+      #every_minutes: 30
+    #- python_file: ctftime.py
+    #  every_minutes: 86400
+  #    - python_file: ebaykleinanzeigen.py
+  #every_minutes: 240
     
 ebay-kleinanzeigen:
     - product: Twenty one pilots Stuttgart
@@ -18,7 +25,7 @@ ebay-kleinanzeigen:
       max_price: 80
 
 blablacar:
-    - from: Darmstadt
-      to: Würzburg
-      starting_at_date: 2019-01-06
-      starting_at_time: 14
+    - from: Stuttgart
+      to: Darmstadt
+      starting_at_date: 2019-03-13
+      starting_at_time: 15
