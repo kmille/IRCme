@@ -1,0 +1,3 @@
+[submodule "modules/aldi-talk-parser"]
+	path = modules/aldi-talk-parser
+	url = git@github.com:kmille/aldi-talk-parser.git
