@@ -38,5 +38,5 @@ six==1.12.0
 tempora==1.14
 termcolor==1.1.0
 traitlets==4.3.2
-urllib3==1.24.1
+urllib3==1.26.5
 wcwidth==0.1.7
